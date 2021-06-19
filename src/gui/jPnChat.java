@@ -87,7 +87,17 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
     public void getid() throws IOException {
         sendRequest(GetIDRequest.builder().action(Action.GET_ID).build());
     }
-
+    public boolean equalCustom(List<String> a, List<String> b){
+        if(a.size()!=b.size()){
+            return false;
+        }
+        for(String aaString:a){
+            if(b.indexOf(aaString)==-1){
+                return false;
+            }
+        }
+        return true;
+    }
     private Socket clientSocket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
@@ -322,11 +332,11 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
             }
         }
         String nameSender = userOnlines.get(idOnlines.indexOf(senderId));
-        if (tab1 && group.equals(idtab1)) {
+        if (tab1 && equalCustom(group,idtab1)) {
             jTAhistory1.append(nameSender + " : " + mess + "");
             return;
         }
-        if (tab2 && group.equals(idtab2)) {
+        if (tab2 && equalCustom(group,idtab2)) {
             jTAhistory2.append(nameSender + " : " + mess + "");
             return;
         }
@@ -338,13 +348,11 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         opentabChat(group, name);
         if (max == 1) {
             jTAhistory1.append(nameSender + " : " + mess + "");
-            jTAhistory1.requestFocus();
-            jTAchat1.requestFocus();
+            
             return;
         }
         jTAhistory2.append(nameSender + " : " + mess + "");
-        jTAhistory2.requestFocus();
-        jTAchat2.requestFocus();
+        
     }
 
     /**
@@ -878,7 +886,7 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         opentabChat(idChatList, nameChatList);
     }//GEN-LAST:event_jListUserMouseClicked
     public void opentabChat(List<String> idChatList, List<String> nameChatList) {
-        if (idChatList.equals(idtab1) || idChatList.equals(idtab2)) {
+        if (equalCustom(idChatList,idtab1) || equalCustom(idChatList,idtab2)) {
             return;
         }
         if (!tab1 || max == 2) {
