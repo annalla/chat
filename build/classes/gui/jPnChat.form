@@ -76,17 +76,6 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" pref="43" max="-2" attributes="0"/>
-              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="jScrollPane1" min="-2" pref="252" max="-2" attributes="0"/>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
-              <Component id="jScrollPane2" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-          </Group>
-          <Group type="102" alignment="0" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jScrollPane3" alignment="0" min="-2" pref="76" max="-2" attributes="0"/>
                   <Group type="102" attributes="0">
@@ -111,6 +100,17 @@
                   <Component id="tabChat2" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
+          </Group>
+          <Group type="102" attributes="0">
+              <EmptySpace min="-2" pref="43" max="-2" attributes="0"/>
+              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="jScrollPane1" min="-2" pref="252" max="-2" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
+              <Component id="jScrollPane2" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -239,30 +239,28 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane7" alignment="0" max="32767" attributes="0"/>
+                  <Component id="jScrollPane12" alignment="0" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane7" alignment="0" max="32767" attributes="0"/>
+                  <Component id="jScrollPane12" alignment="0" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Container class="javax.swing.JScrollPane" name="jScrollPane7">
+            <Container class="javax.swing.JScrollPane" name="jScrollPane12">
               <AuxValues>
                 <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
               </AuxValues>
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
               <SubComponents>
-                <Component class="javax.swing.JTextArea" name="jTAhistory2">
+                <Component class="javax.swing.JTextPane" name="jTPhistory2">
                   <Properties>
-                    <Property name="columns" type="int" value="20"/>
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                      <Font name="Tahoma" size="14" style="0"/>
+                      <Font name="Segoe UI Emoji" size="14" style="0"/>
                     </Property>
-                    <Property name="rows" type="int" value="5"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -296,11 +294,11 @@
                               <Component id="neutral1" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="sad2" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="32767" attributes="0"/>
+                              <EmptySpace pref="273" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
-                              <Component id="jScrollPane4" pref="298" max="32767" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="jScrollPane13" max="32767" attributes="0"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="send2" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
                           </Group>
@@ -320,10 +318,12 @@
                           </Group>
                           <Group type="102" alignment="1" attributes="0">
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="mic2" pref="42" max="32767" attributes="0"/>
-                                  <Component id="send2" min="-2" pref="40" max="-2" attributes="0"/>
-                                  <Component id="jScrollPane4" alignment="0" pref="0" max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="mic2" min="-2" pref="42" max="-2" attributes="0"/>
+                                  <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+                                      <Component id="jScrollPane13" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="send2" alignment="0" pref="40" max="32767" attributes="0"/>
+                                  </Group>
                               </Group>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
@@ -347,28 +347,6 @@
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Container class="javax.swing.JScrollPane" name="jScrollPane4">
-              <AuxValues>
-                <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
-              </AuxValues>
-
-              <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
-              <SubComponents>
-                <Component class="javax.swing.JTextArea" name="jTAchat2">
-                  <Properties>
-                    <Property name="columns" type="int" value="20"/>
-                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                      <Font name="Tahoma" size="14" style="0"/>
-                    </Property>
-                    <Property name="rows" type="int" value="5"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="jTAchat2KeyReleased"/>
-                    <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="jTAchat2KeyTyped"/>
-                  </Events>
-                </Component>
-              </SubComponents>
-            </Container>
             <Component class="javax.swing.JLabel" name="send2">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
@@ -392,6 +370,9 @@
                   <Image iconType="3" name="/gui/images/emoticon-neutral-outline.png"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="neutral1MouseClicked"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="sad2">
               <Properties>
@@ -399,6 +380,9 @@
                   <Image iconType="3" name="/gui/images/emoticon-sad-outline.png"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="sad2MouseClicked"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="kiss2">
               <Properties>
@@ -406,6 +390,9 @@
                   <Image iconType="3" name="/gui/images/emoticon-kiss-outline.png"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="kiss2MouseClicked"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="smile2">
               <Properties>
@@ -413,6 +400,9 @@
                   <Image iconType="3" name="/gui/images/emoticon-happy-outline.png"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="smile2MouseClicked"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="happy2">
               <Properties>
@@ -420,6 +410,9 @@
                   <Image iconType="3" name="/gui/images/emoticon-excited-outline.png"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="happy2MouseClicked"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="attach1">
               <Properties>
@@ -428,6 +421,25 @@
                 </Property>
               </Properties>
             </Component>
+            <Container class="javax.swing.JScrollPane" name="jScrollPane13">
+              <AuxValues>
+                <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+              </AuxValues>
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+              <SubComponents>
+                <Component class="javax.swing.JTextPane" name="jTPchat2">
+                  <Properties>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Segoe UI Emoji" size="14" style="0"/>
+                    </Property>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="jTPchat2KeyReleased"/>
+                  </Events>
+                </Component>
+              </SubComponents>
+            </Container>
           </SubComponents>
         </Container>
         <Component class="javax.swing.JLabel" name="jLbName2">
@@ -503,7 +515,7 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="mic1" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="jScrollPane5" min="-2" pref="296" max="-2" attributes="0"/>
+                              <Component id="jScrollPane11" min="-2" pref="296" max="-2" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="send1" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -519,7 +531,7 @@
                               <Component id="sad1" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace pref="24" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -527,11 +539,11 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="mic1" pref="42" max="32767" attributes="0"/>
-                          <Component id="jScrollPane5" pref="0" max="32767" attributes="0"/>
                           <Component id="send1" max="32767" attributes="0"/>
                           <Component id="attach2" alignment="0" max="32767" attributes="0"/>
+                          <Component id="jScrollPane11" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -547,28 +559,6 @@
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Container class="javax.swing.JScrollPane" name="jScrollPane5">
-              <AuxValues>
-                <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
-              </AuxValues>
-
-              <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
-              <SubComponents>
-                <Component class="javax.swing.JTextArea" name="jTAchat1">
-                  <Properties>
-                    <Property name="columns" type="int" value="20"/>
-                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                      <Font name="Tahoma" size="14" style="0"/>
-                    </Property>
-                    <Property name="rows" type="int" value="5"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="jTAchat1KeyReleased"/>
-                    <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="jTAchat1KeyTyped"/>
-                  </Events>
-                </Component>
-              </SubComponents>
-            </Container>
             <Component class="javax.swing.JLabel" name="send1">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
@@ -599,6 +589,9 @@
                   <Image iconType="3" name="/gui/images/emoticon-excited-outline.png"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="happy1MouseClicked"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="kiss1">
               <Properties>
@@ -606,6 +599,9 @@
                   <Image iconType="3" name="/gui/images/emoticon-kiss-outline.png"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="kiss1MouseClicked"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="smile1">
               <Properties>
@@ -613,6 +609,9 @@
                   <Image iconType="3" name="/gui/images/emoticon-happy-outline.png"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="smile1MouseClicked"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="neutral2">
               <Properties>
@@ -620,6 +619,9 @@
                   <Image iconType="3" name="/gui/images/emoticon-neutral-outline.png"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="neutral2MouseClicked"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="sad1">
               <Properties>
@@ -627,7 +629,29 @@
                   <Image iconType="3" name="/gui/images/emoticon-sad-outline.png"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="sad1MouseClicked"/>
+              </Events>
             </Component>
+            <Container class="javax.swing.JScrollPane" name="jScrollPane11">
+              <AuxValues>
+                <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+              </AuxValues>
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+              <SubComponents>
+                <Component class="javax.swing.JTextPane" name="jTPchat1">
+                  <Properties>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Segoe UI Emoji" size="14" style="0"/>
+                    </Property>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="jTPchat1KeyReleased"/>
+                  </Events>
+                </Component>
+              </SubComponents>
+            </Container>
           </SubComponents>
         </Container>
         <Container class="javax.swing.JPanel" name="jPanel2">
@@ -666,30 +690,28 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane6" alignment="0" max="32767" attributes="0"/>
+                  <Component id="jScrollPane10" alignment="0" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane6" alignment="0" pref="321" max="32767" attributes="0"/>
+                  <Component id="jScrollPane10" alignment="0" pref="321" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Container class="javax.swing.JScrollPane" name="jScrollPane6">
+            <Container class="javax.swing.JScrollPane" name="jScrollPane10">
               <AuxValues>
                 <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
               </AuxValues>
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
               <SubComponents>
-                <Component class="javax.swing.JTextArea" name="jTAhistory1">
+                <Component class="javax.swing.JTextPane" name="jTPhistory1">
                   <Properties>
-                    <Property name="columns" type="int" value="20"/>
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                      <Font name="Tahoma" size="14" style="0"/>
+                      <Font name="Segoe UI Emoji" size="14" style="0"/>
                     </Property>
-                    <Property name="rows" type="int" value="5"/>
                   </Properties>
                 </Component>
               </SubComponents>

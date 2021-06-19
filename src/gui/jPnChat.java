@@ -20,9 +20,11 @@ import commoms.response.GetIDResponse;
 import commoms.response.MessageResponse;
 //import commoms.response.MessageResponse;
 import commoms.response.UserOnlineResponse;
+import controller.emoji;
 import controller.serverInfor;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Font;
 import java.io.Closeable;
 import org.apache.commons.lang3.ObjectUtils;
 import java.io.IOException;
@@ -40,6 +42,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 
 /**
  *
@@ -87,17 +94,19 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
     public void getid() throws IOException {
         sendRequest(GetIDRequest.builder().action(Action.GET_ID).build());
     }
-    public boolean equalCustom(List<String> a, List<String> b){
-        if(a.size()!=b.size()){
+
+    public boolean equalCustom(List<String> a, List<String> b) {
+        if (a.size() != b.size()) {
             return false;
         }
-        for(String aaString:a){
-            if(b.indexOf(aaString)==-1){
+        for (String aaString : a) {
+            if (b.indexOf(aaString) == -1) {
                 return false;
             }
         }
         return true;
     }
+    private emoji emj = new emoji();
     private Socket clientSocket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
@@ -273,7 +282,11 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
                         MessageResponse messageResponse = (MessageResponse) object;
                         int vt = idOnlines.indexOf(messageResponse.getSenderId());
                         String nameSender = userOnlines.get(vt);
-                        setMessagetoHistory(messageResponse.getMessage(), messageResponse.getSenderId(), messageResponse.getGroup());
+                        try {
+                            setMessagetoHistory(messageResponse.getMessage(), messageResponse.getSenderId(), messageResponse.getGroup());
+                        } catch (BadLocationException ex) {
+                            Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
+                        }
 
                     }
                     if (object instanceof UserOnlineResponse) {
@@ -316,7 +329,15 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         }
     }
 
-    public void setMessagetoHistory(String mess, String senderId, List<String> group) {
+    public void setMessagetoHistory(String mess, String senderId, List<String> group) throws BadLocationException {
+        String s1 = mess;
+        s1 = s1.replaceAll(":v", emj.getEmojihappy());
+//        String s2=s1.replaceAll(":(", emj.getEmojisad());
+//        String s3=s2.replaceAll(":)", emj.getEmojismile());
+//        String s4=s3.replaceAll(":|", emj.getEmojineutral());
+//        String s5=s4.replaceAll(":3", emj.getEmojikiss());
+//        mess=s5;
+        mess += "\n";
         group.remove(idUser);
         if (group.size() > 1) {
             if (listGroupId.indexOf(group) == -1) {
@@ -332,12 +353,22 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
             }
         }
         String nameSender = userOnlines.get(idOnlines.indexOf(senderId));
-        if (tab1 && equalCustom(group,idtab1)) {
-            jTAhistory1.append(nameSender + " : " + mess + "");
+        if (tab1 && equalCustom(group, idtab1)) {
+            //       jTAhistory1.append(nameSender + " : " + mess + "");
+            SimpleAttributeSet attributeSet = new SimpleAttributeSet();
+            StyleConstants.setFontFamily(attributeSet, "Segoe UI Emoji");
+            StyleConstants.setFontSize(attributeSet, 14);
+            Document doc = jTPhistory1.getStyledDocument();
+            doc.insertString(doc.getLength(), nameSender + " : " + mess, attributeSet);
             return;
         }
-        if (tab2 && equalCustom(group,idtab2)) {
-            jTAhistory2.append(nameSender + " : " + mess + "");
+        if (tab2 && equalCustom(group, idtab2)) {
+//            jTAhistory2.append(nameSender + " : " + mess + "");
+            SimpleAttributeSet attributeSet = new SimpleAttributeSet();
+            StyleConstants.setFontFamily(attributeSet, "Segoe UI Emoji");
+            StyleConstants.setFontSize(attributeSet, 14);
+            Document doc = jTPhistory2.getStyledDocument();
+            doc.insertString(doc.getLength(), nameSender + " : " + mess, attributeSet);
             return;
         }
         List<String> name = new ArrayList<>();
@@ -347,12 +378,21 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         }
         opentabChat(group, name);
         if (max == 1) {
-            jTAhistory1.append(nameSender + " : " + mess + "");
-            
+            // jTAhistory1.append(nameSender + " : " + mess + "");
+            SimpleAttributeSet attributeSet = new SimpleAttributeSet();
+            StyleConstants.setFontFamily(attributeSet, "Segoe UI Emoji");
+            StyleConstants.setFontSize(attributeSet, 14);
+            Document doc = jTPhistory1.getStyledDocument();
+            doc.insertString(doc.getLength(), nameSender + " : " + mess, attributeSet);
             return;
         }
-        jTAhistory2.append(nameSender + " : " + mess + "");
-        
+        //jTAhistory2.append(nameSender + " : " + mess + "");
+        SimpleAttributeSet attributeSet = new SimpleAttributeSet();
+        StyleConstants.setFontFamily(attributeSet, "Segoe UI Emoji");
+        StyleConstants.setFontSize(attributeSet, 14);
+        Document doc = jTPhistory2.getStyledDocument();
+        doc.insertString(doc.getLength(), nameSender + " : " + mess, attributeSet);
+
     }
 
     /**
@@ -372,11 +412,9 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         jPanel1 = new javax.swing.JPanel();
         camera2 = new javax.swing.JLabel();
         jPnhistory2 = new javax.swing.JPanel();
-        jScrollPane7 = new javax.swing.JScrollPane();
-        jTAhistory2 = new javax.swing.JTextArea();
+        jScrollPane12 = new javax.swing.JScrollPane();
+        jTPhistory2 = new javax.swing.JTextPane();
         jPanel3 = new javax.swing.JPanel();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        jTAchat2 = new javax.swing.JTextArea();
         send2 = new javax.swing.JLabel();
         mic2 = new javax.swing.JLabel();
         neutral1 = new javax.swing.JLabel();
@@ -385,11 +423,11 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         smile2 = new javax.swing.JLabel();
         happy2 = new javax.swing.JLabel();
         attach1 = new javax.swing.JLabel();
+        jScrollPane13 = new javax.swing.JScrollPane();
+        jTPchat2 = new javax.swing.JTextPane();
         jLbName2 = new javax.swing.JLabel();
         tabChat1 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
-        jScrollPane5 = new javax.swing.JScrollPane();
-        jTAchat1 = new javax.swing.JTextArea();
         send1 = new javax.swing.JLabel();
         mic1 = new javax.swing.JLabel();
         attach2 = new javax.swing.JLabel();
@@ -398,11 +436,13 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         smile1 = new javax.swing.JLabel();
         neutral2 = new javax.swing.JLabel();
         sad1 = new javax.swing.JLabel();
+        jScrollPane11 = new javax.swing.JScrollPane();
+        jTPchat1 = new javax.swing.JTextPane();
         jPanel2 = new javax.swing.JPanel();
         camera1 = new javax.swing.JLabel();
         jPnhistory1 = new javax.swing.JPanel();
-        jScrollPane6 = new javax.swing.JScrollPane();
-        jTAhistory1 = new javax.swing.JTextArea();
+        jScrollPane10 = new javax.swing.JScrollPane();
+        jTPhistory1 = new javax.swing.JTextPane();
         jLbName1 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -466,34 +506,19 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
 
         jPnhistory2.setPreferredSize(new java.awt.Dimension(4, 0));
 
-        jTAhistory2.setColumns(20);
-        jTAhistory2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jTAhistory2.setRows(5);
-        jScrollPane7.setViewportView(jTAhistory2);
+        jTPhistory2.setFont(new java.awt.Font("Segoe UI Emoji", 0, 14)); // NOI18N
+        jScrollPane12.setViewportView(jTPhistory2);
 
         javax.swing.GroupLayout jPnhistory2Layout = new javax.swing.GroupLayout(jPnhistory2);
         jPnhistory2.setLayout(jPnhistory2Layout);
         jPnhistory2Layout.setHorizontalGroup(
             jPnhistory2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane7)
+            .addComponent(jScrollPane12)
         );
         jPnhistory2Layout.setVerticalGroup(
             jPnhistory2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane7)
+            .addComponent(jScrollPane12)
         );
-
-        jTAchat2.setColumns(20);
-        jTAchat2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jTAchat2.setRows(5);
-        jTAchat2.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                jTAchat2KeyReleased(evt);
-            }
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                jTAchat2KeyTyped(evt);
-            }
-        });
-        jScrollPane4.setViewportView(jTAchat2);
 
         send2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/send.png"))); // NOI18N
         send2.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -505,16 +530,49 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         mic2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/microphone.png"))); // NOI18N
 
         neutral1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/emoticon-neutral-outline.png"))); // NOI18N
+        neutral1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                neutral1MouseClicked(evt);
+            }
+        });
 
         sad2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/emoticon-sad-outline.png"))); // NOI18N
+        sad2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                sad2MouseClicked(evt);
+            }
+        });
 
         kiss2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/emoticon-kiss-outline.png"))); // NOI18N
+        kiss2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                kiss2MouseClicked(evt);
+            }
+        });
 
         smile2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/emoticon-happy-outline.png"))); // NOI18N
+        smile2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                smile2MouseClicked(evt);
+            }
+        });
 
         happy2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/emoticon-excited-outline.png"))); // NOI18N
+        happy2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                happy2MouseClicked(evt);
+            }
+        });
 
         attach1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/attachment.png"))); // NOI18N
+
+        jTPchat2.setFont(new java.awt.Font("Segoe UI Emoji", 0, 14)); // NOI18N
+        jTPchat2.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTPchat2KeyReleased(evt);
+            }
+        });
+        jScrollPane13.setViewportView(jTPchat2);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -539,10 +597,10 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
                         .addComponent(neutral1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(sad2)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap(273, Short.MAX_VALUE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane13)
+                        .addGap(18, 18, 18)
                         .addComponent(send2)
                         .addGap(27, 27, 27))))
         );
@@ -557,10 +615,11 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
                         .addComponent(happy2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(mic2, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
-                            .addComponent(send2, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(mic2, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(jScrollPane13, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(send2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)))
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -609,19 +668,6 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
 
         jPanel4.setPreferredSize(new java.awt.Dimension(428, 64));
 
-        jTAchat1.setColumns(20);
-        jTAchat1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jTAchat1.setRows(5);
-        jTAchat1.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                jTAchat1KeyReleased(evt);
-            }
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                jTAchat1KeyTyped(evt);
-            }
-        });
-        jScrollPane5.setViewportView(jTAchat1);
-
         send1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/send.png"))); // NOI18N
         send1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -634,14 +680,47 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         attach2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/attachment.png"))); // NOI18N
 
         happy1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/emoticon-excited-outline.png"))); // NOI18N
+        happy1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                happy1MouseClicked(evt);
+            }
+        });
 
         kiss1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/emoticon-kiss-outline.png"))); // NOI18N
+        kiss1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                kiss1MouseClicked(evt);
+            }
+        });
 
         smile1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/emoticon-happy-outline.png"))); // NOI18N
+        smile1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                smile1MouseClicked(evt);
+            }
+        });
 
         neutral2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/emoticon-neutral-outline.png"))); // NOI18N
+        neutral2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                neutral2MouseClicked(evt);
+            }
+        });
 
         sad1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/emoticon-sad-outline.png"))); // NOI18N
+        sad1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                sad1MouseClicked(evt);
+            }
+        });
+
+        jTPchat1.setFont(new java.awt.Font("Segoe UI Emoji", 0, 14)); // NOI18N
+        jTPchat1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTPchat1KeyReleased(evt);
+            }
+        });
+        jScrollPane11.setViewportView(jTPchat1);
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -655,7 +734,7 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(mic1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 296, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jScrollPane11, javax.swing.GroupLayout.PREFERRED_SIZE, 296, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(send1))
                     .addGroup(jPanel4Layout.createSequentialGroup()
@@ -668,17 +747,17 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
                         .addComponent(neutral2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(sad1)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(mic1, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
-                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addComponent(send1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(attach2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(attach2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane11))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(happy1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
@@ -707,20 +786,18 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
                 .addComponent(camera1))
         );
 
-        jTAhistory1.setColumns(20);
-        jTAhistory1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jTAhistory1.setRows(5);
-        jScrollPane6.setViewportView(jTAhistory1);
+        jTPhistory1.setFont(new java.awt.Font("Segoe UI Emoji", 0, 14)); // NOI18N
+        jScrollPane10.setViewportView(jTPhistory1);
 
         javax.swing.GroupLayout jPnhistory1Layout = new javax.swing.GroupLayout(jPnhistory1);
         jPnhistory1.setLayout(jPnhistory1Layout);
         jPnhistory1Layout.setHorizontalGroup(
             jPnhistory1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane6)
+            .addComponent(jScrollPane10)
         );
         jPnhistory1Layout.setVerticalGroup(
             jPnhistory1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
+            .addComponent(jScrollPane10, javax.swing.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
         );
 
         jLbName1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -842,16 +919,6 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(43, 43, 43)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 252, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel2)
-                .addGap(7, 7, 7)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
@@ -870,6 +937,16 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
                     .addComponent(tabChat1, javax.swing.GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE)
                     .addComponent(tabChat2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGap(43, 43, 43)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 252, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel2)
+                .addGap(7, 7, 7)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -886,7 +963,7 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         opentabChat(idChatList, nameChatList);
     }//GEN-LAST:event_jListUserMouseClicked
     public void opentabChat(List<String> idChatList, List<String> nameChatList) {
-        if (equalCustom(idChatList,idtab1) || equalCustom(idChatList,idtab2)) {
+        if (equalCustom(idChatList, idtab1) || equalCustom(idChatList, idtab2)) {
             return;
         }
         if (!tab1 || max == 2) {
@@ -895,7 +972,7 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
             idtab1 = idChatList;
             usertab1 = nameChatList;
             setNameJlb(jLbName1, usertab1);
-            jTAchat1.setText("");
+            jTPchat1.setText("");
             tabChat1.setVisible(tab1);
             return;
         }
@@ -904,7 +981,7 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         idtab2 = idChatList;
         usertab2 = nameChatList;
         setNameJlb(jLbName2, usertab2);
-        jTAchat2.setText("");
+        jTPchat2.setText("");
         tabChat2.setVisible(tab2);
     }
 
@@ -946,53 +1023,28 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
 
     }//GEN-LAST:event_btnDisconnectActionPerformed
 
-    private void jTAchat1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTAchat1KeyReleased
-        // TODO add your handling code here:
-        if (enterIsSend) {
-            if (evt.getKeyCode() == evt.VK_ENTER) {
-                tabchoose = 1;
-                sendMessage(tabchoose, jTAchat1, jTAhistory1);
-            }
-        }
-
-    }//GEN-LAST:event_jTAchat1KeyReleased
-
-    private void jTAchat1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTAchat1KeyTyped
-        // TODO add your handling code here:
-
-
-    }//GEN-LAST:event_jTAchat1KeyTyped
-
-    private void jTAchat2KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTAchat2KeyReleased
-        // TODO add your handling code here:
-        if (enterIsSend) {
-            if (evt.getKeyCode() == evt.VK_ENTER) {
-                tabchoose = 2;
-                sendMessage(tabchoose, jTAchat2, jTAhistory2);
-            }
-        }
-
-    }//GEN-LAST:event_jTAchat2KeyReleased
-
     private void send1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_send1MouseClicked
         // TODO add your handling code here:
         tabchoose = 1;
-        sendMessage(tabchoose, jTAchat1, jTAhistory1);
+        try {
+            message += "\n";
+            sendMessage(tabchoose, jTPchat1, jTPhistory1);
+        } catch (BadLocationException ex) {
+            Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_send1MouseClicked
 
     private void send2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_send2MouseClicked
         // TODO add your handling code here:
         tabchoose = 2;
-        sendMessage(tabchoose, jTAchat2, jTAhistory2);
+        try {
+            message += "\n";
+            sendMessage(tabchoose, jTPchat2, jTPhistory2);
+        } catch (BadLocationException ex) {
+            Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_send2MouseClicked
 
-    private void jTAchat2KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTAchat2KeyTyped
-        // TODO add your handling code here:
-        if (evt.getKeyCode() == evt.VK_ENTER && evt.getKeyCode() == evt.VK_SHIFT) {
-            System.out.println("ok");
-
-        }
-    }//GEN-LAST:event_jTAchat2KeyTyped
 
     private void otpEnterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_otpEnterActionPerformed
         // TODO add your handling code here:
@@ -1021,6 +1073,148 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         // TODO add your handling code here:
         openGroupChatNew();
     }//GEN-LAST:event_jListGroupChatMouseClicked
+
+    private void happy1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_happy1MouseClicked
+        // TODO add your handling code here:
+        try {
+            addemoji(jTPchat1, emj.getEmojihappy());
+
+        } catch (BadLocationException ex) {
+            Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_happy1MouseClicked
+
+    private void jTPchat2KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTPchat2KeyReleased
+        // TODO add your handling code here:
+        if (enterIsSend) {
+            if (evt.getKeyCode() == evt.VK_ENTER) {
+                tabchoose = 2;
+                try {
+                    sendMessage(tabchoose, jTPchat2, jTPhistory2);
+                } catch (BadLocationException ex) {
+                    Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }//GEN-LAST:event_jTPchat2KeyReleased
+
+    private void jTPchat1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTPchat1KeyReleased
+        // TODO add your handling code here:
+        if (enterIsSend) {
+            if (evt.getKeyCode() == evt.VK_ENTER) {
+                tabchoose = 1;
+                try {
+                    sendMessage(tabchoose, jTPchat1, jTPhistory1);
+                } catch (BadLocationException ex) {
+                    Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }//GEN-LAST:event_jTPchat1KeyReleased
+
+    private void kiss1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_kiss1MouseClicked
+        // TODO add your handling code here:
+        try {
+            addemoji(jTPchat1, emj.getEmojikiss());
+
+        } catch (BadLocationException ex) {
+            Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_kiss1MouseClicked
+
+    private void smile1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_smile1MouseClicked
+        try {
+            addemoji(jTPchat1, emj.getEmojismile());
+
+        } catch (BadLocationException ex) {
+            Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        // TODO add your handling code here:
+    }//GEN-LAST:event_smile1MouseClicked
+
+    private void neutral2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_neutral2MouseClicked
+        // TODO add your handling code here:
+        try {
+            addemoji(jTPchat1, emj.getEmojineutral());
+
+        } catch (BadLocationException ex) {
+            Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_neutral2MouseClicked
+
+    private void sad1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sad1MouseClicked
+        // TODO add your handling code here:
+        try {
+            addemoji(jTPchat1, emj.getEmojisad());
+
+        } catch (BadLocationException ex) {
+            Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_sad1MouseClicked
+
+    private void happy2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_happy2MouseClicked
+        // TODO add your handling code here:
+        try {
+            addemoji(jTPchat2, emj.getEmojihappy());
+
+        } catch (BadLocationException ex) {
+            Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_happy2MouseClicked
+
+    private void kiss2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_kiss2MouseClicked
+        // TODO add your handling code here:
+        try {
+            addemoji(jTPchat2, emj.getEmojikiss());
+
+        } catch (BadLocationException ex) {
+            Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_kiss2MouseClicked
+
+    private void smile2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_smile2MouseClicked
+        // TODO add your handling code here:
+        try {
+            addemoji(jTPchat2, emj.getEmojismile());
+
+        } catch (BadLocationException ex) {
+            Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_smile2MouseClicked
+
+    private void neutral1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_neutral1MouseClicked
+        // TODO add your handling code here:
+        try {
+            addemoji(jTPchat2, emj.getEmojineutral());
+
+        } catch (BadLocationException ex) {
+            Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_neutral1MouseClicked
+
+    private void sad2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sad2MouseClicked
+        // TODO add your handling code here:
+        try {
+            addemoji(jTPchat2, emj.getEmojisad());
+
+        } catch (BadLocationException ex) {
+            Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_sad2MouseClicked
+    //SimpleAttributeSet attributeSet = new SimpleAttributeSet();
+
+    public void addemoji(JTextPane ta, String e) throws BadLocationException {
+
+        //ta.setText(ta.getText()+emj.getEmojihappy());
+        SimpleAttributeSet attributeSet = new SimpleAttributeSet();
+        StyleConstants.setFontFamily(attributeSet, "Segoe UI Emoji");
+        StyleConstants.setFontSize(attributeSet, 14);
+        Document doc = ta.getStyledDocument();
+        doc.insertString(doc.getLength(), e, attributeSet);
+        ta.requestFocus();
+
+    }
+
     public void openGroupChatNew() {
         int index = jListGroupChat.getSelectedIndex();
         String nameString = jListGroupChat.getSelectedValue();
@@ -1092,13 +1286,24 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         jTFGroup.setText(jTFGroup.getText() + name + ",");
     }
 
-    public void sendMessage(int tabchoose, JTextArea ta, JTextArea history) {
+    public void sendMessage(int tabchoose, JTextPane ta, JTextPane history) throws BadLocationException {
         message = ta.getText();
         if (message.length() == 0) {
             JOptionPane.showMessageDialog(null, "The message is empty!");
             return;
         }
-        history.append("me : " + message + "");
+        // history.append("me : " + message + "");
+        SimpleAttributeSet attributeSet = new SimpleAttributeSet();
+        StyleConstants.setFontFamily(attributeSet, "Segoe UI Emoji");
+        StyleConstants.setFontSize(attributeSet, 14);
+        Document doc = history.getStyledDocument();
+        message = message.replaceAll(":\\(", emj.getEmojisad());
+        message = message.replaceAll(":\\)", emj.getEmojismile());
+        message = message.replaceAll(":\\|", emj.getEmojineutral());
+        message = message.replaceAll(":3", emj.getEmojikiss());
+        message = message.replaceAll(":D", emj.getEmojihappy());
+
+        doc.insertString(doc.getLength(), "me : " + message + "\n", attributeSet);
         ta.setText("");
         history.requestFocus();
         ta.requestFocus();
@@ -1140,17 +1345,17 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
     private javax.swing.JPanel jPnhistory1;
     private javax.swing.JPanel jPnhistory2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane10;
+    private javax.swing.JScrollPane jScrollPane11;
+    private javax.swing.JScrollPane jScrollPane12;
+    private javax.swing.JScrollPane jScrollPane13;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane4;
-    private javax.swing.JScrollPane jScrollPane5;
-    private javax.swing.JScrollPane jScrollPane6;
-    private javax.swing.JScrollPane jScrollPane7;
-    private javax.swing.JTextArea jTAchat1;
-    private javax.swing.JTextArea jTAchat2;
-    private javax.swing.JTextArea jTAhistory1;
-    private javax.swing.JTextArea jTAhistory2;
     private javax.swing.JTextField jTFGroup;
+    private javax.swing.JTextPane jTPchat1;
+    private javax.swing.JTextPane jTPchat2;
+    private javax.swing.JTextPane jTPhistory1;
+    private javax.swing.JTextPane jTPhistory2;
     private javax.swing.JLabel kiss1;
     private javax.swing.JLabel kiss2;
     private javax.swing.JLabel mic1;

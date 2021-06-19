@@ -47,9 +47,9 @@
               <Component id="jPnBack" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="jPnmanage" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="86" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="41" max="-2" attributes="0"/>
               <Component id="jLbName" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="63" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="108" max="-2" attributes="0"/>
               <Component id="btnLogout" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
           </Group>
