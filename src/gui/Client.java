@@ -105,11 +105,8 @@ public class Client extends javax.swing.JFrame {
         jLbServer = new javax.swing.JLabel();
         jLbinforServer = new javax.swing.JLabel();
         jPnView = new javax.swing.JPanel();
-        jPnmanage = new javax.swing.JPanel();
-        jLbmanage = new javax.swing.JLabel();
-        jPnBack = new javax.swing.JPanel();
-        jLbBack = new javax.swing.JLabel();
         jLbNoServer = new javax.swing.JLabel();
+        btnManage = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -153,54 +150,19 @@ public class Client extends javax.swing.JFrame {
         );
         jPnViewLayout.setVerticalGroup(
             jPnViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 559, Short.MAX_VALUE)
-        );
-
-        jLbmanage.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLbmanage.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLbmanage.setText("MANAGE SERVER LIST");
-        jLbmanage.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLbmanageMouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPnmanageLayout = new javax.swing.GroupLayout(jPnmanage);
-        jPnmanage.setLayout(jPnmanageLayout);
-        jPnmanageLayout.setHorizontalGroup(
-            jPnmanageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLbmanage, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
-        );
-        jPnmanageLayout.setVerticalGroup(
-            jPnmanageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLbmanage, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
-        );
-
-        jLbBack.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLbBack.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLbBack.setText("CHAT");
-        jLbBack.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLbBackMouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPnBackLayout = new javax.swing.GroupLayout(jPnBack);
-        jPnBack.setLayout(jPnBackLayout);
-        jPnBackLayout.setHorizontalGroup(
-            jPnBackLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPnBackLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLbBack, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-        jPnBackLayout.setVerticalGroup(
-            jPnBackLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLbBack, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
+            .addGap(0, 558, Short.MAX_VALUE)
         );
 
         jLbNoServer.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLbNoServer.setText("NO SERVER");
+
+        btnManage.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        btnManage.setText("Manage Server List");
+        btnManage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnManageActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -222,11 +184,9 @@ public class Client extends javax.swing.JFrame {
                     .addComponent(jLbServer))
                 .addGap(18, 18, 18)
                 .addComponent(jLbinforServer)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 205, Short.MAX_VALUE)
-                .addComponent(jPnBack, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPnmanage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(41, 41, 41)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 318, Short.MAX_VALUE)
+                .addComponent(btnManage, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(42, 42, 42)
                 .addComponent(jLbName)
                 .addGap(108, 108, 108)
                 .addComponent(btnLogout)
@@ -241,22 +201,20 @@ public class Client extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLbNoServer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLbNoServer, javax.swing.GroupLayout.DEFAULT_SIZE, 44, Short.MAX_VALUE)
+                            .addComponent(btnManage, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(49, 49, 49))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPnmanage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jPnBack, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLbName)
-                                    .addComponent(btnLogout)
-                                    .addComponent(CBServer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jLbServer)
-                                    .addComponent(jLbinforServer))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnConnect)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLbName)
+                            .addComponent(btnLogout)
+                            .addComponent(CBServer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2)
+                            .addComponent(jLbServer)
+                            .addComponent(jLbinforServer))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnConnect)
                         .addGap(31, 31, 31)))
                 .addComponent(jPnView, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -270,9 +228,7 @@ public class Client extends javax.swing.JFrame {
         connectServer();
     }//GEN-LAST:event_btnConnectActionPerformed
     public void connectServer() {
-        btnConnect.setEnabled(false);
-        CBServer.setEditable(false);
-        btnLogout.setEnabled(false);
+        btnManage.setEnabled(false);
         vtServer = CBServer.getSelectedIndex();
         jLbServer.setVisible(true);
         jLbinforServer.setVisible(true);
@@ -285,6 +241,9 @@ public class Client extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
+        btnConnect.setEnabled(false);
+        CBServer.setEditable(false);
+        btnLogout.setEnabled(false);
     }
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
 
@@ -292,15 +251,10 @@ public class Client extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_btnLogoutActionPerformed
 
-    private void jLbmanageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLbmanageMouseClicked
+    private void btnManageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnManageActionPerformed
         // TODO add your handling code here:
         setDashboard2(jPnView);
-    }//GEN-LAST:event_jLbmanageMouseClicked
-
-    private void jLbBackMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLbBackMouseClicked
-        // TODO add your handling code here:
-        connectServer();
-    }//GEN-LAST:event_jLbBackMouseClicked
+    }//GEN-LAST:event_btnManageActionPerformed
 
     /**
      * @param args the command line arguments //
@@ -341,15 +295,12 @@ public class Client extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> CBServer;
     private javax.swing.JButton btnConnect;
     private javax.swing.JButton btnLogout;
+    private javax.swing.JButton btnManage;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLbBack;
     private javax.swing.JLabel jLbName;
     private javax.swing.JLabel jLbNoServer;
     private javax.swing.JLabel jLbServer;
     private javax.swing.JLabel jLbinforServer;
-    private javax.swing.JLabel jLbmanage;
-    private javax.swing.JPanel jPnBack;
     private javax.swing.JPanel jPnView;
-    private javax.swing.JPanel jPnmanage;
     // End of variables declaration//GEN-END:variables
 }

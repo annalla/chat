@@ -41,7 +41,7 @@ import org.apache.commons.lang3.ObjectUtils;
  * @author Xuyen
  */
 public class server extends javax.swing.JFrame implements Runnable {
-
+    
     public ServerSocket serverSocket = null;
     private Map<String, ClientHandler> clientHandlers;
     private serverInfor serverinfor;
@@ -61,7 +61,7 @@ public class server extends javax.swing.JFrame implements Runnable {
             openServerbyClient(port);
         }
     }
-
+    
     public void openServerbyClient(int port) throws IOException {
         serverSocket = new ServerSocket(port);
         int p = serverSocket.getLocalPort();
@@ -81,7 +81,7 @@ public class server extends javax.swing.JFrame implements Runnable {
         btnOpen.setEnabled(false);
         btnClose.setEnabled(true);
     }
-
+    
     public void setServer() {
         int n = Chat.listServer.size();
         jTFServername.setEnabled(false);
@@ -355,7 +355,7 @@ public class server extends javax.swing.JFrame implements Runnable {
         this.dispose();
     }//GEN-LAST:event_btnExitActionPerformed
     private class closeServerDM implements Runnable {
-
+        
         @Override
         public void run() {
             for (String id : clientHandlers.keySet()) {
@@ -367,7 +367,7 @@ public class server extends javax.swing.JFrame implements Runnable {
                     } catch (IOException ex) {
                         Logger.getLogger(server.class.getName()).log(Level.SEVERE, null, ex);
                     }
-
+                    
                 }
             }
             if (serverSocket != null) {
@@ -379,7 +379,7 @@ public class server extends javax.swing.JFrame implements Runnable {
             }
         }
     }
-
+    
     public void closeServer() throws IOException {
         Thread t = new Thread(new closeServerDM());
         t.start();
@@ -391,7 +391,7 @@ public class server extends javax.swing.JFrame implements Runnable {
         jTFport.setText("");
         jPanel1.setVisible(false);
     }
-
+    
     public void openServer() throws IOException {
         String port = jTFport.getText();
         if (port.length() == 0) {
@@ -433,17 +433,17 @@ public class server extends javax.swing.JFrame implements Runnable {
         btnExit.setEnabled(false);
         btnClose.setEnabled(true);
     }
-
+    
     public void setUserOnlinetoGUI(List<String> user) {
         int n = user.size();
         if (n == 0) {
             jListUseronline.setModel(new javax.swing.AbstractListModel<String>() {
                 String[] strings = new String[0];
-
+                
                 public int getSize() {
                     return strings.length;
                 }
-
+                
                 public String getElementAt(int i) {
                     return strings[i];
                 }
@@ -455,17 +455,17 @@ public class server extends javax.swing.JFrame implements Runnable {
         }
         jListUseronline.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = listUseronline;
-
+            
             public int getSize() {
                 return strings.length;
             }
-
+            
             public String getElementAt(int i) {
                 return strings[i];
             }
         });
     }
-
+    
     @Override
     public void run() {
         //start(ABORT);
@@ -492,17 +492,17 @@ public class server extends javax.swing.JFrame implements Runnable {
                 e.printStackTrace();
             }
         }
-
+        
     }
-
+    
     public void setInfor() {
 //        String port = jTFport.getText();
 //        int p = Integer.parseInt(port);
         jLBServername.setText(jTFServername.getText());
         jLbport.setText(String.valueOf(this.portset));
-
+        
     }
-
+    
     public server(JButton jButton1, JButton jButton2, JLabel jLBServername, JLabel jLabel1, JLabel jLabel2, JLabel jLabel3, JLabel jLabel4, JLabel jLabel5, JLabel jLabel7, JLabel jLabel8, JLabel jLbHostname, JLabel jLbport, JList<String> jList1, JPanel jPanel1, JPanel jPninfor, JScrollPane jScrollPane1, JTextField jTFServername, JTextField jTFport, GraphicsConfiguration gc) {
         super(gc);
         this.btnOpen = jButton1;
@@ -524,7 +524,7 @@ public class server extends javax.swing.JFrame implements Runnable {
         this.jTFServername = jTFServername;
         this.jTFport = jTFport;
     }
-
+    
     public server(JButton jButton1, JButton jButton2, JLabel jLBServername, JLabel jLabel1, JLabel jLabel2, JLabel jLabel3, JLabel jLabel4, JLabel jLabel5, JLabel jLabel7, JLabel jLabel8, JLabel jLbHostname, JLabel jLbport, JList<String> jList1, JPanel jPanel1, JPanel jPninfor, JScrollPane jScrollPane1, JTextField jTFServername, JTextField jTFport) throws HeadlessException {
         this.btnOpen = jButton1;
         this.btnClose = jButton2;
@@ -591,31 +591,31 @@ public class server extends javax.swing.JFrame implements Runnable {
                 .map(ClientHandler::getUid)
                 .collect(Collectors.toList());
     }
-
+    
     private List<String> getUserNameOnline() {
         return this.clientHandlers.values().stream()
                 .map(ClientHandler::getUsername)
                 .collect(Collectors.toList());
     }
-
+    
     private List<String> getUserIdOnline(String me) {
         List<String> dm = this.clientHandlers.values().stream()
                 .map(ClientHandler::getUid)
                 .collect(Collectors.toList());
         dm.remove(me);
         return dm;
-
+        
     }
-
+    
     private List<String> getUserNameOnline(String me) {
         List<String> dm = this.clientHandlers.values().stream()
                 .map(ClientHandler::getUsername)
                 .collect(Collectors.toList());
         dm.remove(me);
         return dm;
-
+        
     }
-
+    
     private Map<String, String> getMapUserIdOnline(String me) {
         Map<String, String> dmList = new HashMap<>();
         List<String> idList = this.clientHandlers.values().stream()
@@ -630,56 +630,56 @@ public class server extends javax.swing.JFrame implements Runnable {
         dmList.remove(me);
         return dmList;
     }
-
+    
     public void pushUsername() {
-
+        
     }
 //Tham khảo va Custom
 
     private class ClientHandler extends Thread {
-
+        
         private Socket clientSocket;
         private ObjectInputStream in;
         private ObjectOutputStream out;
         private String uid;
         private String username;
-
+        
         public Socket getClientSocket() {
             return clientSocket;
         }
-
+        
         public String getUsername() {
             return username;
         }
-
+        
         public String getUid() {
             return uid;
         }
-
+        
         public ObjectInputStream getIn() {
             return in;
         }
-
+        
         public ObjectOutputStream getOut() {
             return out;
         }
-
+        
         public void setClientSocket(Socket clientSocket) {
             this.clientSocket = clientSocket;
         }
-
+        
         public void setIn(ObjectInputStream in) {
             this.in = in;
         }
-
+        
         public void setOut(ObjectOutputStream out) {
             this.out = out;
         }
-
+        
         public void setUid(String uid) {
             this.uid = uid;
         }
-
+        
         public ClientHandler(Socket socket) throws IOException {
             this.clientSocket = socket;
             out = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -687,7 +687,7 @@ public class server extends javax.swing.JFrame implements Runnable {
             this.uid = UUID.randomUUID().toString();
             this.username = this.uid;
         }
-
+        
         private void response(Response response) throws IOException {
             if (response == null) {
                 return;
@@ -695,18 +695,38 @@ public class server extends javax.swing.JFrame implements Runnable {
             this.out.writeObject(response);
             this.out.flush();
         }
-
+        
         @Override
         public void run() {
             try {
                 while (true) {
-                    int i = 0;
-                    i++;
                     Object input = in.readObject();
-                    i++;
                     if (ObjectUtils.isNotEmpty(input)) {
                         Request request = (Request) input;
                         switch (request.getAction()) {
+                            case SEND_FILE: {
+                                SendFileRequest groupMessageRequest = (SendFileRequest) request;
+                                
+                                System.out.println(groupMessageRequest.getContent().length);
+                                for (String s : groupMessageRequest.getUids()) {
+                                    ClientHandler clientHandler = clientHandlers.get(s);
+                                    if (clientHandler != null) {
+                                        ReceiveFileResponse receiveFileResponse=
+                                                new ReceiveFileResponse(groupMessageRequest.getFileName(), 
+                                                        groupMessageRequest.getGroupList(), groupMessageRequest.getContent(), Statuscode.OK, this.uid);
+                                        clientHandler.response(receiveFileResponse);
+                                      
+//                                        clientHandler.response(ReceiveFileResponse.builder()
+//                                                .senderId(this.getUid())
+//                                                .groupList(groupMessageRequest.getGroupList())
+//                                                .fileName(groupMessageRequest.getFileName())
+//                                                .content(groupMessageRequest.getContent())
+//                                                .statusCode(Statuscode.OK)
+//                                                .build());
+                                    }
+                                }
+                                break;
+                            }
                             case GET_ID: {
                                 this.response(GetIDResponse.builder()
                                         .myid(this.uid)
@@ -717,15 +737,10 @@ public class server extends javax.swing.JFrame implements Runnable {
                             case GET_USERS_ONLINE: {
                                 UserOnlineResponse user = new UserOnlineResponse(getUserIdOnline(uid), getUserNameOnline(uid), Statuscode.OK);
                                 this.response(user);
-//                                Map<String,String> map=getMapUserIdOnline(this.uid);
-//                                for(Map.Entry<String,String> entry: map.entrySet()){
-//                                     System.out.println(entry.getKey() + " " + entry.getValue());
-//                                }
-
                                 break;
                             }
                             case SET_USERNAME: {
-
+                                
                                 this.username = ((setUsernameRequest) (request)).getUsername();
                                 setUserOnlinetoGUI(getUserNameOnline());
                                 for (String id : clientHandlers.keySet()) {
@@ -733,26 +748,11 @@ public class server extends javax.swing.JFrame implements Runnable {
                                     if (cl != null) {
                                         UserOnlineResponse user = new UserOnlineResponse(getUserIdOnline(cl.uid), getUserNameOnline(cl.username), Statuscode.OK);
                                         cl.response(user);
-
+                                        
                                     }
                                 }
                                 break;
                             }
-//                            case SEND_MESSAGE_TO_USER_SPECIFIC: {
-//                                ClientHandler clientHandler = clientHandlers.get(((MessageRequest) (request)).getUid());
-//                                if (clientHandler == null) {
-//                                    this.response(MessageResponse.builder()
-//                                            .statusCode(Statuscode.BAD_REQUEST)
-//                                            .build());
-//                                } else {
-//                                    clientHandler.response(MessageResponse.builder()
-//                                            .message(((MessageRequest) (request)).getMessage())
-//                                            .senderId(this.getUid())
-//                                            .statusCode(Statuscode.OK)
-//                                            .build());
-//                                }
-//                                break;
-//                            }
                             case CHAT_ALL: {
                                 GroupMessageRequest groupMessageRequest = (GroupMessageRequest) request;
                                 for (String s : groupMessageRequest.getUids()) {
@@ -785,12 +785,12 @@ public class server extends javax.swing.JFrame implements Runnable {
                                 break;
                         }
                     }
-
+                    
                 }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             } finally {
-
+                
             }
         }
     }

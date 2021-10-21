@@ -14,22 +14,30 @@ import commoms.request.InformationRequest;
 import commoms.request.MessageRequest;
 //import commoms.request.MessageRequest;
 import commoms.request.Request;
+import commoms.request.SendFileRequest;
 import commoms.request.setUsernameRequest;
 import commoms.response.CloseServerResponse;
 import commoms.response.GetIDResponse;
 import commoms.response.MessageResponse;
+import commoms.response.ReceiveFileResponse;
 //import commoms.response.MessageResponse;
 import commoms.response.UserOnlineResponse;
+import controller.MyFile;
 import controller.emoji;
 import controller.serverInfor;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Font;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.Closeable;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import org.apache.commons.lang3.ObjectUtils;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,6 +55,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
+import javax.swing.JFileChooser;
+import java.io.File;
 
 /**
  *
@@ -59,6 +69,11 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
      */
     public jPnChat() throws IOException {
         initComponents();
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+        directoryChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        jTFfile.setEditable(false);
+        jTFfile2.setEditable(false);
+        btnSendFile1.setEnabled(false);
         nameUser = Client.nameString;
         choice = Action.SETUP;
         tabChat1.setVisible(false);
@@ -106,7 +121,14 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         }
         return true;
     }
-    private emoji emj = new emoji();
+    private FileInputStream fis = null;
+    private FileOutputStream fos = null;
+    private File selectedFile;
+    private boolean isRecieve1;
+    private boolean isRecieve2;
+    List<String> allfilenamesList = new ArrayList<>();
+    List<byte[]> fileList = new ArrayList<>();
+    private final emoji emj = new emoji();
     private Socket clientSocket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
@@ -114,7 +136,7 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
     List<String> idOnlines;
     private Action choice = Action.SETUP;
     private JFrame jframe;
-    private String nameUser;
+    private final String nameUser;
     private String idUser;
     private boolean tab1 = false;
     private boolean tab2 = false;
@@ -226,6 +248,35 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
                     new Client(nameUser).setVisible(true);
                     return;
                 }
+                case SEND_FILE: {
+                    byte[] content = new byte[(int) (selectedFile.length())];
+
+                    FileInputStream fileInputStream = new FileInputStream(selectedFile.getAbsolutePath());
+                    fileInputStream.read(content);
+
+                    if (tabchoose == 1) {
+                        List<String> idtab = new ArrayList<>(this.idtab1);
+                        idtab.add(idUser);
+                        sendRequest(SendFileRequest.builder()
+                                .action(Action.SEND_FILE)
+                                .content(content)
+                                .fileName(selectedFile.getName())
+                                .uids(new ArrayList<>(this.idtab1))
+                                .groupList(idtab)
+                                .build());
+                    } else {
+                        List<String> idtab = new ArrayList<>(this.idtab2);
+                        idtab.add(idUser);
+                        sendRequest(SendFileRequest.builder()
+                                .action(Action.SEND_FILE)
+                                .content(content)
+                                .fileName(selectedFile.getName())
+                                .uids(this.idtab2)
+                                .groupList(idtab)
+                                .build());
+                    }
+                    break;
+                }
                 case CHAT_ALL: {
                     try {
                         if (tabchoose == 1) {
@@ -299,7 +350,15 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
                             System.out.println("Request failed!!!");
                         }
                     }
-
+                    if (object instanceof ReceiveFileResponse) {
+                        ReceiveFileResponse messageResponse = (ReceiveFileResponse) object;
+                        // System.out.println(messageResponse.getFileName());
+                        //System.out.println(messageResponse.getContent().length);
+                        allfilenamesList.add(messageResponse.getFileName());
+                        fileList.add(messageResponse.getContent());
+                        //  filesMap.put(messageResponse.getFileName(),new MyFile(messageResponse.getFileName(), messageResponse.getContent()));
+                        setFiletoHistory(messageResponse.getFileName(), messageResponse.getSenderId(), messageResponse.getGroupList());
+                    }
                     if (object instanceof CloseServerResponse) {
                         CloseServerResponse messageResponse = (CloseServerResponse) object;
                         CloseAll();
@@ -310,6 +369,8 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
+            } catch (BadLocationException ex) {
+                Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
             } finally {
                 try {
                     if (in != null) {
@@ -329,15 +390,11 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         }
     }
 
-    public void setMessagetoHistory(String mess, String senderId, List<String> group) throws BadLocationException {
-        String s1 = mess;
-        s1 = s1.replaceAll(":v", emj.getEmojihappy());
-//        String s2=s1.replaceAll(":(", emj.getEmojisad());
-//        String s3=s2.replaceAll(":)", emj.getEmojismile());
-//        String s4=s3.replaceAll(":|", emj.getEmojineutral());
-//        String s5=s4.replaceAll(":3", emj.getEmojikiss());
-//        mess=s5;
-        mess += "\n";
+    public void setFiletoHistory(String mess, String senderId, List<String> group) throws BadLocationException {
+        SimpleAttributeSet attributeSet = new SimpleAttributeSet();
+        StyleConstants.setFontFamily(attributeSet, "Segoe UI Emoji");
+        StyleConstants.setFontSize(attributeSet, 14);
+
         group.remove(idUser);
         if (group.size() > 1) {
             if (listGroupId.indexOf(group) == -1) {
@@ -355,18 +412,77 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         String nameSender = userOnlines.get(idOnlines.indexOf(senderId));
         if (tab1 && equalCustom(group, idtab1)) {
             //       jTAhistory1.append(nameSender + " : " + mess + "");
-            SimpleAttributeSet attributeSet = new SimpleAttributeSet();
-            StyleConstants.setFontFamily(attributeSet, "Segoe UI Emoji");
-            StyleConstants.setFontSize(attributeSet, 14);
+            jTFfile.setText(mess);
+            btnSendFile1.setText("Download");
+            btnSendFile1.setEnabled(true);
+            isRecieve1 = true;
+
+            Document doc = jTPhistory1.getStyledDocument();
+            doc.insertString(doc.getLength(), nameSender + " : sent file - " + mess, attributeSet);
+            return;
+        }
+        if (tab2 && equalCustom(group, idtab2)) {
+//            jTAhistory2.append(nameSender + " : " + mess + "");
+            jTFfile2.setText(mess);
+            btnSend2.setText("Download");
+            btnSend2.setEnabled(true);
+            isRecieve2 = true;
+            Document doc = jTPhistory2.getStyledDocument();
+            doc.insertString(doc.getLength(), nameSender + " : sent file - " + mess, attributeSet);
+            return;
+        }
+        List<String> name = new ArrayList<>();
+        for (String id : group) {
+            int vt = idOnlines.indexOf(id);
+            name.add(userOnlines.get(vt));
+        }
+        opentabChat(group, name);
+        if (max == 1) {
+            jTFfile.setText(mess);
+            btnSendFile1.setText("Download");
+            btnSendFile1.setEnabled(true);
+            isRecieve1 = true;
+
+            Document doc = jTPhistory1.getStyledDocument();
+            doc.insertString(doc.getLength(), nameSender + " : sent file - " + mess, attributeSet);
+            return;
+        }
+        jTFfile2.setText(mess);
+        btnSend2.setText("Download");
+        btnSend2.setEnabled(true);
+        isRecieve2 = true;
+        Document doc = jTPhistory2.getStyledDocument();
+        doc.insertString(doc.getLength(), nameSender + " : sent file - " + mess, attributeSet);
+    }
+
+    public void setMessagetoHistory(String mess, String senderId, List<String> group) throws BadLocationException {
+        SimpleAttributeSet attributeSet = new SimpleAttributeSet();
+        StyleConstants.setFontFamily(attributeSet, "Segoe UI Emoji");
+        StyleConstants.setFontSize(attributeSet, 14);
+        group.remove(idUser);
+        if (group.size() > 1) {
+            if (listGroupId.indexOf(group) == -1) {
+                listGroupId.add(new ArrayList<>(group));
+                String nameGroup = "";
+                for (String s : group) {
+                    nameGroup += userOnlines.get(idOnlines.indexOf(s));
+                    nameGroup += ",";
+                }
+                nameGroup = nameGroup.substring(0, nameGroup.length() - 1);
+                listGroupName.add(nameGroup);
+                setGrouptoList();
+            }
+        }
+        String nameSender = userOnlines.get(idOnlines.indexOf(senderId));
+        if (tab1 && equalCustom(group, idtab1)) {
+            //       jTAhistory1.append(nameSender + " : " + mess + "");
+
             Document doc = jTPhistory1.getStyledDocument();
             doc.insertString(doc.getLength(), nameSender + " : " + mess, attributeSet);
             return;
         }
         if (tab2 && equalCustom(group, idtab2)) {
 //            jTAhistory2.append(nameSender + " : " + mess + "");
-            SimpleAttributeSet attributeSet = new SimpleAttributeSet();
-            StyleConstants.setFontFamily(attributeSet, "Segoe UI Emoji");
-            StyleConstants.setFontSize(attributeSet, 14);
             Document doc = jTPhistory2.getStyledDocument();
             doc.insertString(doc.getLength(), nameSender + " : " + mess, attributeSet);
             return;
@@ -379,17 +495,11 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         opentabChat(group, name);
         if (max == 1) {
             // jTAhistory1.append(nameSender + " : " + mess + "");
-            SimpleAttributeSet attributeSet = new SimpleAttributeSet();
-            StyleConstants.setFontFamily(attributeSet, "Segoe UI Emoji");
-            StyleConstants.setFontSize(attributeSet, 14);
             Document doc = jTPhistory1.getStyledDocument();
             doc.insertString(doc.getLength(), nameSender + " : " + mess, attributeSet);
             return;
         }
         //jTAhistory2.append(nameSender + " : " + mess + "");
-        SimpleAttributeSet attributeSet = new SimpleAttributeSet();
-        StyleConstants.setFontFamily(attributeSet, "Segoe UI Emoji");
-        StyleConstants.setFontSize(attributeSet, 14);
         Document doc = jTPhistory2.getStyledDocument();
         doc.insertString(doc.getLength(), nameSender + " : " + mess, attributeSet);
 
@@ -414,6 +524,8 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         jPnhistory2 = new javax.swing.JPanel();
         jScrollPane12 = new javax.swing.JScrollPane();
         jTPhistory2 = new javax.swing.JTextPane();
+        jTFfile2 = new javax.swing.JTextField();
+        btnSend2 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         send2 = new javax.swing.JLabel();
         mic2 = new javax.swing.JLabel();
@@ -422,7 +534,7 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         kiss2 = new javax.swing.JLabel();
         smile2 = new javax.swing.JLabel();
         happy2 = new javax.swing.JLabel();
-        attach1 = new javax.swing.JLabel();
+        attach2 = new javax.swing.JLabel();
         jScrollPane13 = new javax.swing.JScrollPane();
         jTPchat2 = new javax.swing.JTextPane();
         jLbName2 = new javax.swing.JLabel();
@@ -430,7 +542,7 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         jPanel4 = new javax.swing.JPanel();
         send1 = new javax.swing.JLabel();
         mic1 = new javax.swing.JLabel();
-        attach2 = new javax.swing.JLabel();
+        attach1 = new javax.swing.JLabel();
         happy1 = new javax.swing.JLabel();
         kiss1 = new javax.swing.JLabel();
         smile1 = new javax.swing.JLabel();
@@ -443,6 +555,8 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         jPnhistory1 = new javax.swing.JPanel();
         jScrollPane10 = new javax.swing.JScrollPane();
         jTPhistory1 = new javax.swing.JTextPane();
+        jTFfile = new javax.swing.JTextField();
+        btnSendFile1 = new javax.swing.JButton();
         jLbName1 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -509,15 +623,41 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         jTPhistory2.setFont(new java.awt.Font("Segoe UI Emoji", 0, 14)); // NOI18N
         jScrollPane12.setViewportView(jTPhistory2);
 
+        jTFfile2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jTFfile2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTFfile2ActionPerformed(evt);
+            }
+        });
+
+        btnSend2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        btnSend2.setText("Send");
+        btnSend2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSend2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPnhistory2Layout = new javax.swing.GroupLayout(jPnhistory2);
         jPnhistory2.setLayout(jPnhistory2Layout);
         jPnhistory2Layout.setHorizontalGroup(
             jPnhistory2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane12)
+            .addGroup(jPnhistory2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jTFfile2, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnSend2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPnhistory2Layout.setVerticalGroup(
             jPnhistory2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane12)
+            .addGroup(jPnhistory2Layout.createSequentialGroup()
+                .addComponent(jScrollPane12, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPnhistory2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jTFfile2)
+                    .addComponent(btnSend2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         send2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/send.png"))); // NOI18N
@@ -564,7 +704,12 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
             }
         });
 
-        attach1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/attachment.png"))); // NOI18N
+        attach2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/attachment.png"))); // NOI18N
+        attach2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                attach2MouseClicked(evt);
+            }
+        });
 
         jTPchat2.setFont(new java.awt.Font("Segoe UI Emoji", 0, 14)); // NOI18N
         jTPchat2.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -586,7 +731,7 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(kiss2))
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(attach1)
+                        .addComponent(attach2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(mic2)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -610,7 +755,7 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                        .addComponent(attach1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(attach2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(happy2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
@@ -677,7 +822,12 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
 
         mic1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/microphone.png"))); // NOI18N
 
-        attach2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/attachment.png"))); // NOI18N
+        attach1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/attachment.png"))); // NOI18N
+        attach1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                attach1MouseClicked(evt);
+            }
+        });
 
         happy1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/images/emoticon-excited-outline.png"))); // NOI18N
         happy1.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -730,7 +880,7 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(attach2)
+                        .addComponent(attach1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(mic1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -747,7 +897,7 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
                         .addComponent(neutral2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(sad1)))
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -756,7 +906,7 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(mic1, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
                     .addComponent(send1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(attach2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(attach1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane11))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -789,15 +939,36 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         jTPhistory1.setFont(new java.awt.Font("Segoe UI Emoji", 0, 14)); // NOI18N
         jScrollPane10.setViewportView(jTPhistory1);
 
+        jTFfile.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jTFfile.setToolTipText("File");
+
+        btnSendFile1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        btnSendFile1.setText("Send");
+        btnSendFile1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSendFile1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPnhistory1Layout = new javax.swing.GroupLayout(jPnhistory1);
         jPnhistory1.setLayout(jPnhistory1Layout);
         jPnhistory1Layout.setHorizontalGroup(
             jPnhistory1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane10)
+            .addGroup(jPnhistory1Layout.createSequentialGroup()
+                .addComponent(jTFfile, javax.swing.GroupLayout.PREFERRED_SIZE, 284, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnSendFile1, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         jPnhistory1Layout.setVerticalGroup(
             jPnhistory1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane10, javax.swing.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
+            .addGroup(jPnhistory1Layout.createSequentialGroup()
+                .addComponent(jScrollPane10, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPnhistory1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jTFfile, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
+                    .addComponent(btnSendFile1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         jLbName1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -905,10 +1076,10 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnClear)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(tabChat2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(64, 64, 64)))
+                        .addComponent(tabChat2, javax.swing.GroupLayout.PREFERRED_SIZE, 435, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(61, 61, 61)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -973,6 +1144,7 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
             usertab1 = nameChatList;
             setNameJlb(jLbName1, usertab1);
             jTPchat1.setText("");
+            jTPhistory1.setText("");
             tabChat1.setVisible(tab1);
             return;
         }
@@ -982,6 +1154,7 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         usertab2 = nameChatList;
         setNameJlb(jLbName2, usertab2);
         jTPchat2.setText("");
+        jTPhistory2.setText("");
         tabChat2.setVisible(tab2);
     }
 
@@ -1027,8 +1200,7 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         // TODO add your handling code here:
         tabchoose = 1;
         try {
-            message += "\n";
-            sendMessage(tabchoose, jTPchat1, jTPhistory1);
+            sendMessage(tabchoose, jTPchat1, jTPhistory1, true);
         } catch (BadLocationException ex) {
             Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1038,8 +1210,7 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         // TODO add your handling code here:
         tabchoose = 2;
         try {
-            message += "\n";
-            sendMessage(tabchoose, jTPchat2, jTPhistory2);
+            sendMessage(tabchoose, jTPchat2, jTPhistory2, true);
         } catch (BadLocationException ex) {
             Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1090,7 +1261,7 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
             if (evt.getKeyCode() == evt.VK_ENTER) {
                 tabchoose = 2;
                 try {
-                    sendMessage(tabchoose, jTPchat2, jTPhistory2);
+                    sendMessage(tabchoose, jTPchat2, jTPhistory2, false);
                 } catch (BadLocationException ex) {
                     Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -1104,7 +1275,7 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
             if (evt.getKeyCode() == evt.VK_ENTER) {
                 tabchoose = 1;
                 try {
-                    sendMessage(tabchoose, jTPchat1, jTPhistory1);
+                    sendMessage(tabchoose, jTPchat1, jTPhistory1, false);
                 } catch (BadLocationException ex) {
                     Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -1201,7 +1372,139 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
             Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_sad2MouseClicked
-    //SimpleAttributeSet attributeSet = new SimpleAttributeSet();
+
+    private void attach1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_attach1MouseClicked
+        // TODO add your handling code here:
+        int result = fileChooser.showOpenDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            selectedFile = fileChooser.getSelectedFile();
+            if (selectedFile == null) {
+                btnSendFile1.setEnabled(false);
+                return;
+            }
+            btnSendFile1.setText("Send");
+            isRecieve1 = false;
+            btnSendFile1.setEnabled(true);
+            jTFfile.setText(selectedFile.getName());
+        }
+    }//GEN-LAST:event_attach1MouseClicked
+
+    private void btnSendFile1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendFile1ActionPerformed
+        // TODO add your handling code here:
+        tabchoose = 1;
+        if (!isRecieve1) {
+
+            try {
+                sendFile();
+            } catch (BadLocationException ex) {
+                Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return;
+        }
+        try {
+            downloadFile(tabchoose);
+        } catch (IOException ex) {
+            Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnSendFile1ActionPerformed
+
+    private void jTFfile2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFfile2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTFfile2ActionPerformed
+
+    private void btnSend2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSend2ActionPerformed
+        // TODO add your handling code here:
+        tabchoose = 2;
+        if (!isRecieve1) {
+
+            try {
+                sendFile();
+            } catch (BadLocationException ex) {
+                Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return;
+        }
+        try {
+            downloadFile(tabchoose);
+        } catch (IOException ex) {
+            Logger.getLogger(jPnChat.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnSend2ActionPerformed
+
+    private void attach2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_attach2MouseClicked
+        // TODO add your handling code here:
+        int result = fileChooser.showOpenDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            selectedFile = fileChooser.getSelectedFile();
+            if (selectedFile == null) {
+                btnSend2.setEnabled(false);
+                return;
+            }
+            btnSend2.setText("Send");
+            isRecieve2 = false;
+            btnSend2.setEnabled(true);
+            jTFfile2.setText(selectedFile.getName());
+        }
+    }//GEN-LAST:event_attach2MouseClicked
+    public void sendFile() throws BadLocationException {
+        choice = Action.SEND_FILE;
+        Thread t = new Thread(this);
+        t.start();
+        setFile(tabchoose);
+    }
+
+    public void setFile(int tabchoose) throws BadLocationException {
+        SimpleAttributeSet attributeSet = new SimpleAttributeSet();
+        StyleConstants.setFontFamily(attributeSet, "Segoe UI Emoji");
+        StyleConstants.setFontSize(attributeSet, 14);
+        if (tabchoose == 1) {
+            jTFfile.setText("");
+            Document doc = jTPhistory1.getStyledDocument();
+            doc.insertString(doc.getLength(), "me : sent file - " + selectedFile.getName(), attributeSet);
+            return;
+        }
+        jTFfile2.setText("");
+        Document doc = jTPhistory2.getStyledDocument();
+        doc.insertString(doc.getLength(), "me : sent file - " + selectedFile.getName(), attributeSet);
+        return;
+    }
+
+    public void downloadFile(int tabchoose) throws IOException {
+        if (tabchoose == 1) {
+            int result = directoryChooser.showOpenDialog(null);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                byte[] content = fileList.get(allfilenamesList.indexOf(jTFfile.getText()));
+                String nameString = directoryChooser.getSelectedFile().getAbsolutePath();
+                nameString += "\\";
+                nameString += jTFfile.getText();
+                //System.out.println(nameString);
+                File fileToDownload = new File(nameString);
+                FileOutputStream fileOutputStream = new FileOutputStream(fileToDownload);
+                // Write the actual file data to the file.
+                fileOutputStream.write(content);
+                // Close the stream.
+                fileOutputStream.close();
+                JOptionPane.showMessageDialog(null, "Download thanh cong!");
+            }
+        } else {
+            int result = directoryChooser.showOpenDialog(null);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                byte[] content = fileList.get(allfilenamesList.indexOf(jTFfile2.getText()));
+                String nameString = directoryChooser.getSelectedFile().getAbsolutePath();
+                nameString += "\\";
+                nameString += jTFfile2.getText();
+                //System.out.println(nameString);
+                File fileToDownload = new File(nameString);
+                FileOutputStream fileOutputStream = new FileOutputStream(fileToDownload);
+                // Write the actual file data to the file.
+                fileOutputStream.write(content);
+                // Close the stream.
+                fileOutputStream.close();
+                JOptionPane.showMessageDialog(null, "Download thanh cong!");
+            }
+        }
+
+    }
 
     public void addemoji(JTextPane ta, String e) throws BadLocationException {
 
@@ -1286,13 +1589,16 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         jTFGroup.setText(jTFGroup.getText() + name + ",");
     }
 
-    public void sendMessage(int tabchoose, JTextPane ta, JTextPane history) throws BadLocationException {
+    public void sendMessage(int tabchoose, JTextPane ta, JTextPane history, boolean isSend) throws BadLocationException {
         message = ta.getText();
         if (message.length() == 0) {
             JOptionPane.showMessageDialog(null, "The message is empty!");
             return;
         }
         // history.append("me : " + message + "");
+        if (isSend) {
+            message += "\n";
+        }
         SimpleAttributeSet attributeSet = new SimpleAttributeSet();
         StyleConstants.setFontFamily(attributeSet, "Segoe UI Emoji");
         StyleConstants.setFontSize(attributeSet, 14);
@@ -1303,7 +1609,7 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
         message = message.replaceAll(":3", emj.getEmojikiss());
         message = message.replaceAll(":D", emj.getEmojihappy());
 
-        doc.insertString(doc.getLength(), "me : " + message + "\n", attributeSet);
+        doc.insertString(doc.getLength(), "me : " + message, attributeSet);
         ta.setText("");
         history.requestFocus();
         ta.requestFocus();
@@ -1319,13 +1625,16 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
 
     }
 
-
+    JFileChooser directoryChooser = new JFileChooser();
+    JFileChooser fileChooser = new JFileChooser();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel attach1;
     private javax.swing.JLabel attach2;
     private javax.swing.JButton btnClear;
     private javax.swing.JButton btnCreateGroup;
     private javax.swing.JButton btnDisconnect;
+    private javax.swing.JButton btnSend2;
+    private javax.swing.JButton btnSendFile1;
     private javax.swing.JLabel camera1;
     private javax.swing.JLabel camera2;
     private javax.swing.JLabel happy1;
@@ -1352,6 +1661,8 @@ public class jPnChat extends javax.swing.JPanel implements Runnable {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTextField jTFGroup;
+    private javax.swing.JTextField jTFfile;
+    private javax.swing.JTextField jTFfile2;
     private javax.swing.JTextPane jTPchat1;
     private javax.swing.JTextPane jTPchat2;
     private javax.swing.JTextPane jTPhistory1;

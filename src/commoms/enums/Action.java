@@ -17,4 +17,5 @@ public enum  Action {
     SEND_MESSAGE_TO_USER_SPECIFIC,
     CHAT_ALL,
     SETUP,
+    SEND_FILE
 }
